@@ -24,7 +24,7 @@ export default function PropertyCard({
 }) {
   const dispatch = useDispatch()
 
-  const { token } = useSelector((s) => s.auth)
+  const { token, user } = useSelector((s) => s.auth)
   const { items } = useSelector((s) => s.favorite)
 
   const isFav = items.some(
@@ -107,21 +107,22 @@ export default function PropertyCard({
           </span>
         </div>
 
-        {/* FAVORITE BUTTON */}
-        {showFav && (
-          <button
-            onClick={toggleFav}
-            className="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow transition-all"
-          >
-            <Heart
-              className={`w-4 h-4 ${
-                isFav
-                  ? 'fill-red-500 text-red-500'
-                  : 'text-stone-500'
-              }`}
-            />
-          </button>
-        )}
+       {/* FAVORITE BUTTON - TENANT ONLY */}
+       {showFav && user?.role === 'TENANT' && (
+       <button
+       onClick={toggleFav}
+       className="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow transition-all"
+       >
+       <Heart
+        className={`w-4 h-4 ${
+         isFav
+          ? 'fill-red-500 text-red-500'
+          : 'text-stone-500'
+      }`}
+     />
+   </button>
+      )}
+
 
         {/* RENT BADGE */}
         <div className="absolute bottom-3 left-3">
@@ -143,7 +144,7 @@ export default function PropertyCard({
         <p className="flex items-center gap-1 text-xs text-stone-500 mb-3">
           <MapPin className="w-3.5 h-3.5 shrink-0" />
           {truncate(
-            `${property.city}, ${property.state}`,
+            [property.address, property.city, property.state, property.pincode].filter(Boolean).join(', '),
             40
           )}
         </p>

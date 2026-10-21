@@ -18,21 +18,31 @@ const ownerLinks = [
   { to: '/owner/properties', icon: Building2,       label: 'My Properties'},
   { to: '/owner/properties/add', icon: PlusCircle,  label: 'Add Property' },
   { to: '/owner/bookings',   icon: Calendar,        label: 'Bookings'     },
+  { to: '/owner/payments',   icon: CreditCard,      label: 'Payments'     },
   { to: '/owner/messages',   icon: MessageCircle,   label: 'Messages'     },
 ]
 
 export default function Sidebar({ role, mobileOpen, onClose }) {
   const normalizedRole = normalizeRole(role)
-  const links = normalizedRole === 'OWNER' ? ownerLinks : tenantLinks
+  const adminLinks = [
+  { to: '/admin', icon: BarChart2, label: 'Dashboard', end: true },
+]
+
+const links =
+  normalizedRole === 'OWNER'
+    ? ownerLinks
+    : normalizedRole === 'ADMIN'
+    ? adminLinks
+    : tenantLinks
   const { user } = useSelector(s => s.auth)
 
   return (
     <>
       {/* Mobile overlay */}
-      {mobileOpen && <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={onClose} />}
+      {mobileOpen && <div className="fixed inset-0 bg-black/40 lg:hidden" onClick={onClose} />}
 
       <aside className={clsx(
-        'fixed top-0 left-0 h-full w-64 bg-white border-r border-stone-100 z-50 flex flex-col transition-transform duration-300',
+        'fixed top-0 left-0 h-full w-[min(18rem,calc(100vw-2rem))] bg-white z-0 border-r border-stone-100 z-50 flex flex-col transition-transform duration-300',
         'lg:relative lg:translate-x-0',
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       )}>

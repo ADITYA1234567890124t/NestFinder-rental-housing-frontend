@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
@@ -12,6 +12,7 @@ import ChatMessage from './ChatMessage'
 import { Send, Loader2 } from 'lucide-react'
 import { getInitials } from '@/utils/validators'
 import toast from 'react-hot-toast'
+import { formatChatDate, getDateKey } from '@/utils/dateFormatter'
 
 export default function ChatBox({
   receiverId,
@@ -405,18 +406,29 @@ export default function ChatBox({
         ) : (
 
           <>
-            {messages.map(
-              (msg, index) => (
+            {(() => {
+              let previousDateKey = null
 
-                <ChatMessage
-                  key={
-                    msg.id
-                    || index
-                  }
-                  message={msg}
-                />
-              )
-            )}
+              return messages.map((msg, index) => {
+                const messageDate = msg.sentAt || msg.timestamp || msg.createdAt
+                const dateKey = getDateKey(messageDate)
+                const showDate = dateKey !== previousDateKey
+                previousDateKey = dateKey
+
+                return (
+                  <Fragment key={msg.id || `${dateKey}-${index}`}>
+                    {showDate && (
+                      <div className="flex justify-center my-4">
+                        <span className="px-3 py-1 rounded-full bg-stone-100 text-stone-500 text-[11px] font-medium">
+                          {formatChatDate(messageDate)}
+                        </span>
+                      </div>
+                    )}
+                    <ChatMessage message={msg} />
+                  </Fragment>
+                )
+              })
+            })()}
 
             <div
               ref={bottomRef}

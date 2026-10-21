@@ -92,7 +92,14 @@ export default function PropertyDetails() {
               </div>
             )}
 
-            <PropertyMap latitude={property.latitude} longitude={property.longitude} address={property.address} />
+            <PropertyMap
+              latitude={property.latitude}
+              longitude={property.longitude}
+              address={property.address}
+              city={property.city}
+              state={property.state}
+              pincode={property.pincode}
+            />
 
             {/* Owner info */}
             {property.owner && (

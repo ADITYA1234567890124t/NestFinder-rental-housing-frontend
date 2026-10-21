@@ -5,6 +5,7 @@ import {
   MessageCircle,
   PlusCircle,
   Home,
+  CreditCard,
 } from 'lucide-react'
 
 export default function OwnerDashboard() {
@@ -26,6 +27,12 @@ export default function OwnerDashboard() {
       description: 'Chat with tenants',
       icon: MessageCircle,
       path: '/owner/messages',
+    },
+    {
+      title: 'Payments',
+      description: 'Track tenant rent payments and earnings',
+      icon: CreditCard,
+      path: '/owner/payments',
     },
     {
       title: 'Add Property',

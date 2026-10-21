@@ -23,7 +23,7 @@ import ResetPassword from '@/features/auth/ResetPassword'
 // Property
 import PropertyList from '@/features/property/PropertyList'
 import PropertyDetails from '@/features/property/PropertyDetails'
-import SearchProperty from '@/features/property/SearchProperty'
+
 import MyProperties from '@/features/property/MyProperties'
 import AddProperty from '@/features/property/AddProperty'
 import EditProperty from '@/features/property/EditProperty'
@@ -76,8 +76,7 @@ export default function AppRoutes() {
 
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
-        <Route path="/search" element={<SearchProperty />} />
-
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -241,6 +240,15 @@ export default function AppRoutes() {
           element={
             <PrivateRoute roles={['OWNER']}>
               <MyBookings />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/owner/payments"
+          element={
+            <PrivateRoute roles={['OWNER']}>
+              <PaymentPage />
             </PrivateRoute>
           }
         />

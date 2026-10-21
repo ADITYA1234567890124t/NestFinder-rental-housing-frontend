@@ -12,8 +12,27 @@ export default function PropertyList() {
   const [filters, setFilters] = useState({})
 
   useEffect(() => {
-    dispatch(fetchProperties({ page, size: 9, sortBy: 'createdAt', sortDir: 'desc', ...filters }))
-  }, [dispatch, page, filters])
+
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(
+      ([, value]) =>
+        value !== '' &&
+        value !== null &&
+        value !== undefined
+    )
+  )
+
+  dispatch(
+    fetchProperties({
+      page,
+      size: 9,
+      sortBy: 'createdAt',
+      sortDir: 'desc',
+      ...cleanFilters
+    })
+  )
+
+}, [dispatch, page, filters])
 
   const handleFilter = (f) => { setFilters(f); setPage(0) }
 

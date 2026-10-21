@@ -17,7 +17,7 @@ import toast from 'react-hot-toast'
 
 export default function Navbar() {
   const { user, token } = useSelector((s) => s.auth)
-  const { unreadCount, conversations } = useSelector((s) => s.chat)
+  const { unreadCount } = useSelector((s) => s.chat)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -42,7 +42,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-100">
+    <header className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-stone-100">
       <div className="page-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -61,10 +61,7 @@ export default function Navbar() {
               Browse
             </Link>
 
-            <Link to="/search" className="btn btn-ghost text-sm">
-              Search
-            </Link>
-
+            
             {token && (
               <Link to={dashPath} className="btn btn-ghost text-sm">
                 Dashboard
@@ -93,27 +90,11 @@ export default function Navbar() {
                 >
                   <MessageCircle className="w-5 h-5" />
 
-                  {(() => {
-                    const recentWindowMs = 24 * 60 * 60 * 1000 // 24 hours
-                    const now = Date.now()
-
-                    const recentUnread = (conversations || []).reduce((acc, c) => {
-                      const last = c?.lastMessage
-                      const count = c?.unreadCount || 0
-                      if (!last || !count) return acc
-
-                      const t = new Date(last.sentAt || last.timestamp).getTime()
-                      if (isNaN(t)) return acc
-
-                      return now - t <= recentWindowMs ? acc + count : acc
-                    }, 0)
-
-                    return recentUnread > 0 ? (
+                  {unreadCount > 0 ? (
                       <span className="absolute top-1 right-1 w-4 h-4 bg-primary-500 text-white text-[10px] rounded-full flex items-center justify-center">
-                        {recentUnread}
+                        {unreadCount}
                       </span>
-                    ) : null
-                  })()}
+                    ) : null}
                 </Link>
 
                 {/* Profile Dropdown */}

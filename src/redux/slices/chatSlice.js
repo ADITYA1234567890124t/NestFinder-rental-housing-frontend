@@ -60,11 +60,20 @@ export const fetchConversation =
             userId
           )
 
+        let unreadCount
+        try {
+          await chatApi.markRead(userId)
+          unreadCount = responseData(await chatApi.getUnreadCount())?.unreadCount ?? 0
+        } catch {
+          unreadCount = null
+        }
+
         return {
           userId,
           partnerName,
           messages:
             responseData(response),
+          unreadCount,
         }
       } catch (e) {
         return rejectWithValue(
@@ -321,15 +330,19 @@ const chatSlice =
 
             if (conversation) {
               state.unreadCount =
-                Math.max(
-                  0,
-                  state.unreadCount -
-                    (conversation.unreadCount ||
-                      0)
-                )
+                action.payload.unreadCount == null
+                  ? Math.max(
+                      0,
+                      state.unreadCount -
+                        (conversation.unreadCount ||
+                          0)
+                    )
+                  : action.payload.unreadCount
 
               conversation.unreadCount =
                 0
+            } else if (action.payload.unreadCount != null) {
+              state.unreadCount = action.payload.unreadCount
             }
           }
         )

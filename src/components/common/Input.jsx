@@ -1,5 +1,6 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useState } from 'react'
 import clsx from 'clsx'
+import { Eye, EyeOff } from 'lucide-react'
 
 const Input = forwardRef(
   (
@@ -8,10 +9,14 @@ const Input = forwardRef(
       error,
       icon: Icon,
       className = '',
+      type = 'text',
       ...props
     },
     ref
   ) => {
+    const [showPassword, setShowPassword] = useState(false)
+    const isPassword = type === 'password'
+
     return (
       <div className="w-full">
         {label && (
@@ -32,10 +37,23 @@ const Input = forwardRef(
             className={clsx(
               error ? 'input-error' : 'input',
               Icon && 'pl-10',
+              isPassword && 'pr-10',
               className
             )}
+            type={isPassword && showPassword ? 'text' : type}
             {...props}
           />
+
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 focus:outline-none focus:ring-2 focus:ring-primary-400 rounded"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          )}
         </div>
 
         {error && (

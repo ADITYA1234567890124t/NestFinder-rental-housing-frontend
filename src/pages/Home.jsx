@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProperties } from '@/redux/slices/propertySlice'
 import PropertyGrid   from '@/components/property/PropertyGrid'
-import SearchBar      from '@/components/common/SearchBar'
+
 import { useNavigate } from 'react-router-dom'
 import { Home as HomeIcon, Shield, MessageCircle, Star, ArrowRight, MapPin } from 'lucide-react'
 
@@ -35,9 +35,7 @@ export default function Home() {
           <p className="text-stone-300 text-lg max-w-xl mx-auto mb-10">
             Discover verified properties across India. Connect with owners directly, book visits, and pay rent — all in one place.
           </p>
-          <div className="max-w-2xl mx-auto">
-            <SearchBar placeholder="Search by city, area, or property name…" onSearch={handleSearch} className="bg-white/10 backdrop-blur rounded-2xl p-2" />
-          </div>
+          
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm text-stone-400">
             {['Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Hyderabad'].map(c => (
               <button key={c} onClick={() => handleSearch(c)} className="flex items-center gap-1 hover:text-white transition-colors">

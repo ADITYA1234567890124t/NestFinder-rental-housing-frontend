@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchMyPayments, fetchEarnings } from '@/redux/slices/paymentSlice'
-import { fetchMyBookings } from '@/redux/slices/bookingSlice'
+import { fetchMyPayments, fetchEarnings, fetchOwnerPaymentHistory } from '@/redux/slices/paymentSlice'
+import { fetchMyBookings, fetchReceivedBookings } from '@/redux/slices/bookingSlice'
 import PaymentHistory from '@/components/payment/PaymentHistory'
 import PaymentForm from '@/components/payment/PaymentForm'
 import Modal from '@/components/common/Modal'
 import Loader from '@/components/common/Loader'
 import Pagination from '@/components/common/Pagination'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { normalizePaymentStatus } from '@/utils/constants'
 import { CreditCard, TrendingUp, Clock, CheckCircle2 } from 'lucide-react'
 
 export default function PaymentPage() {
   const dispatch  = useDispatch()
   const { user }  = useSelector(s => s.auth)
-  const { payments, earnings, loading, totalPages } = useSelector(s => s.payment)
-  const { myBookings } = useSelector(s => s.booking)
+  const { payments, ownerPayments, earnings, loading, ownerLoading, totalPages } = useSelector(s => s.payment)
+  const { myBookings, receivedBookings } = useSelector(s => s.booking)
   const [page, setPage]       = useState(0)
   const [payModal, setPayModal] = useState(false)
   const [selectedBooking, setSelectedBooking] = useState(null)
@@ -22,10 +23,19 @@ export default function PaymentPage() {
   const isOwner = user?.role === 'OWNER'
 
   useEffect(() => {
-    dispatch(fetchMyPayments({ page, size: 10 }))
-    if (isOwner) dispatch(fetchEarnings())
-    else dispatch(fetchMyBookings({ page: 0, size: 50 }))
-  }, [dispatch, page, isOwner])
+    if (isOwner) {
+      dispatch(fetchEarnings())
+      dispatch(fetchOwnerPaymentHistory([]))
+      dispatch(fetchReceivedBookings({ page: 0, size: 100, ownerId: user?.id }))
+    } else {
+      dispatch(fetchMyPayments({ page, size: 10 }))
+      dispatch(fetchMyBookings({ page: 0, size: 50 }))
+    }
+  }, [dispatch, page, isOwner, user?.id])
+
+  useEffect(() => {
+    if (isOwner && receivedBookings.length) dispatch(fetchOwnerPaymentHistory(receivedBookings))
+  }, [dispatch, isOwner, receivedBookings])
 
   const confirmedBookings = myBookings.filter(b => b.status === 'CONFIRMED')
   // Also allow payment for ACTIVE bookings if no CONFIRMED ones exist
@@ -39,14 +49,15 @@ export default function PaymentPage() {
   }
 
   // Include COMPLETED, CONFIRMED, and PROCESSING statuses as paid
-  const totalPaid   = payments.filter(p => ['COMPLETED', 'CONFIRMED', 'PROCESSING'].includes(p.status)).reduce((s, p) => s + p.amount, 0)
+  const visiblePayments = isOwner ? ownerPayments : payments
+  const totalPaid   = visiblePayments.filter(p => ['COMPLETED', 'CONFIRMED', 'PROCESSING'].includes(normalizePaymentStatus(p.status ?? p.paymentStatus))).reduce((s, p) => s + Number(p.amount || 0), 0)
   // Only count PENDING and INITIATED as pending
-  const totalPending= payments.filter(p => ['PENDING', 'INITIATED'].includes(p.status)).length
+  const totalPending= visiblePayments.filter(p => ['PENDING', 'INITIATED'].includes(normalizePaymentStatus(p.status ?? p.paymentStatus))).length
 
   return (
     <div>
       <h1 className="text-2xl font-display font-semibold text-stone-900 mb-6">
-        {isOwner ? 'Earnings' : 'Payments'}
+        {isOwner ? 'Payments & Earnings' : 'Payments'}
       </h1>
 
       {/* Summary cards */}
@@ -60,7 +71,7 @@ export default function PaymentPage() {
               {isOwner ? 'Total Earnings' : 'Total Paid'}
             </p>
             <p className="text-xl font-semibold text-stone-900">
-              {formatCurrency(isOwner ? earnings : totalPaid)}
+              {formatCurrency(isOwner ? (earnings || totalPaid) : totalPaid)}
             </p>
           </div>
         </div>
@@ -81,7 +92,7 @@ export default function PaymentPage() {
           </div>
           <div>
             <p className="text-xs text-stone-400">Total Transactions</p>
-            <p className="text-xl font-semibold text-stone-900">{payments.length}</p>
+            <p className="text-xl font-semibold text-stone-900">{visiblePayments.length}</p>
           </div>
         </div>
       </div>
@@ -128,9 +139,11 @@ export default function PaymentPage() {
 
       {/* Payment history */}
       <div className="card p-5">
-        <h2 className="font-semibold text-stone-900 mb-4">Transaction History</h2>
-        {loading ? <Loader /> : <PaymentHistory payments={payments} />}
-        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+        <h2 className="font-semibold text-stone-900 mb-4">
+          {isOwner ? 'Tenant Payment History' : 'Payment Sent History'}
+        </h2>
+        {loading || ownerLoading ? <Loader /> : <PaymentHistory payments={visiblePayments} showTenant={isOwner} />}
+        {!isOwner && <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />}
       </div>
 
       {/* Payment modal */}

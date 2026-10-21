@@ -14,7 +14,7 @@ export default function ChatMessage({ message }) {
           : 'bg-stone-100 text-stone-800 rounded-bl-sm')}>
         <p>{message.content}</p>
         <p className={clsx('text-[10px] mt-1', isMine ? 'text-primary-200' : 'text-stone-400')}>
-          {formatTime(message.sentAt || message.timestamp)}
+          {formatTime(message.sentAt || message.timestamp || message.createdAt)}
           {message.isRead && isMine && ' - Read'}
         </p>
       </div>

@@ -13,9 +13,19 @@ export const BOOKING_STATUS = {
 
 export const PAYMENT_STATUS = {
   PENDING:   'PENDING',
+  INITIATED: 'INITIATED',
+  PROCESSING: 'PROCESSING',
+  SUCCESS:   'SUCCESS',
+  SUCCESSFUL:'SUCCESSFUL',
   COMPLETED: 'COMPLETED',
   FAILED:    'FAILED',
   REFUNDED:  'REFUNDED',
+}
+
+export const normalizePaymentStatus = (status) => {
+  const value = String(status || '').trim().toUpperCase()
+  if (['SUCCESS', 'SUCCESSFUL', 'PAID'].includes(value)) return PAYMENT_STATUS.COMPLETED
+  return value || PAYMENT_STATUS.PENDING
 }
 
 export const COMPLAINT_STATUS = {
@@ -41,6 +51,11 @@ export const INDIAN_STATES = [
 
 export const STATUS_BADGE = {
   PENDING:     'warning',
+  INITIATED:   'warning',
+  PROCESSING:  'info',
+  SUCCESS:     'success',
+  SUCCESSFUL:  'success',
+  PAID:        'success',
   CONFIRMED:   'success',
   CANCELLED:   'error',
   COMPLETED:   'success',

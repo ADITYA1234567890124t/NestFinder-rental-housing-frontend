@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import api from '@/api/axiosConfig'
 import Loader from '@/components/common/Loader'
 import Pagination from '@/components/common/Pagination'
-import SearchBar from '@/components/common/SearchBar'
 import Modal from '@/components/common/Modal'
 import Button from '@/components/common/Button'
 import { formatDate } from '@/utils/dateFormatter'
@@ -71,9 +70,7 @@ export default function ManageUsers() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="flex-1">
-          <SearchBar placeholder="Search by name or email…" onSearch={setSearch} />
-        </div>
+       
         <div className="flex gap-2">
           {['ALL', 'TENANT', 'OWNER', 'ADMIN'].map(r => (
             <button

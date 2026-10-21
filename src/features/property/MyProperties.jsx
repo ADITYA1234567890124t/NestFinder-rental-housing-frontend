@@ -51,7 +51,7 @@ export default function MyProperties() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h3 className="font-semibold text-stone-900">{p.title}</h3>
-                    <p className="text-sm text-stone-500">{p.city}, {p.state}</p>
+                    <p className="text-sm text-stone-500">{[p.address, p.city, p.state, p.pincode].filter(Boolean).join(', ')}</p>
                     <p className="text-primary-600 font-semibold mt-1">{formatCurrency(p.monthlyRent)}/mo</p>
                   </div>
                   <div className="flex items-center gap-1">
