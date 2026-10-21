@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: rental-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: rental_housing
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ./rental-housing-api
+    container_name: rental-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./rental-housing-ui
+    container_name: rental-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
